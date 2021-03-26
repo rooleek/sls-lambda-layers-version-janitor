@@ -6,6 +6,10 @@ const {CodePipeline} = require('aws-sdk');
 
 let functions = [];
 
+//LAMBDA_ARN_PREFIX
+//LAYER_PREFIX
+//VERSIONS_TO_KEEP
+
 module.exports.handler = async (event) => {
   const codePipeline = new CodePipeline();
   let jobId = event["CodePipeline.job"].id;
@@ -57,15 +61,15 @@ const cleanLayers = async () => {
   const layers = await layer.listLayers(process.env.LAYER_PREFIX);
 
   for (const {LayerName} of layers) {
-  	console.log(LayerName);
     let versions = await layer.listLayersVersions(LayerName);
+
     const versionsToKeep = parseInt(process.env.VERSIONS_TO_KEEP || "3");
-		console.log(versions.LayerVersions);
     if (versions.LayerVersions && Array.isArray(versions.LayerVersions) && versions.LayerVersions.length > versionsToKeep) {
       versions = versions.LayerVersions;
     } else {
       continue;
     }
+
     versions = _.orderBy(versions, v => parseInt(v.Version), "desc");
     log.debug(`keeping the most recent ${versionsToKeep} versions`);
     versions = _.drop(versions, versionsToKeep);
@@ -82,8 +86,6 @@ const cleanLayers = async () => {
 		}
   }
 };
-
-cleanLayers();
 
 const cleanFunc = async (funcArn) => {
   log.debug("cleaning functions...", {function: funcArn});
