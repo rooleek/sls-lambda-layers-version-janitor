@@ -9,6 +9,10 @@ let functions = [];
 //LAMBDA_ARN_PREFIX
 //LAYER_PREFIX
 //VERSIONS_TO_KEEP
+//RETRIES
+//RETRY_MIN_TIMEOUT
+//RETRY_MAX_TIMEOUT
+
 
 module.exports.handler = async (event) => {
   const codePipeline = new CodePipeline();
@@ -38,6 +42,11 @@ module.exports.handler = async (event) => {
 };
 
 const cleanFunctionsVersions = async () => {
+
+  if(!process.env.LAMBDA_ARN_PREFIX){
+    return Promise.resolve();
+  }
+
   if (functions.length === 0) {
     functions = await lambda.listFunctions();
     functions = functions.filter((func) => {
@@ -58,6 +67,11 @@ const cleanFunctionsVersions = async () => {
 };
 
 const cleanLayers = async () => {
+
+  if(!process.env.LAYER_PREFIX){
+    return Promise.resolve();
+  }
+
   const layers = await layer.listLayers(process.env.LAYER_PREFIX);
 
   for (const {LayerName} of layers) {
