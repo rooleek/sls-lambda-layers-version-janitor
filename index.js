@@ -7,7 +7,7 @@ const {CodePipeline} = require('aws-sdk');
 let functions = [];
 
 //LAMBDA_ARN_PREFIX
-//LAYER_PREFIX
+//LAYER_ARN_PREFIX
 //VERSIONS_TO_KEEP
 //RETRIES
 //RETRY_MIN_TIMEOUT
@@ -68,11 +68,11 @@ const cleanFunctionsVersions = async () => {
 
 const cleanLayers = async () => {
 
-  if(!process.env.LAYER_PREFIX){
+  if(!process.env.LAYER_ARN_PREFIX){
     return Promise.resolve();
   }
 
-  const layers = await layer.listLayers(process.env.LAYER_PREFIX);
+  const layers = await layer.listLayers(process.env.LAYER_ARN_PREFIX);
 
   for (const {LayerName} of layers) {
     let versions = await layer.listLayersVersions(LayerName);
