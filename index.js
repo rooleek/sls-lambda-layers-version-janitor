@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const lambda = require("./lib/lambda");
 const layer = require("./lib/layer");
+const {delay} = require("./lib/common");
 const log = require("@dazn/lambda-powertools-logger");
 const {CodePipeline} = require('aws-sdk');
 
@@ -92,7 +93,7 @@ const cleanLayers = async () => {
 				LayerName,
 				VersionNumber
 			});
-
+            await delay(500);
 			await layer.deleteLayerVersion({
 				LayerName,
 				VersionNumber
@@ -117,6 +118,7 @@ const cleanFunc = async (funcArn) => {
 
   for (const version of versions) {
     if (!aliasedVersions.includes(version)) {
+      await delay(500);
       await lambda.deleteVersion(funcArn, version);
     }
   }
